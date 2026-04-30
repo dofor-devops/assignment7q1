@@ -1,5 +1,5 @@
 # Use a valid Java base image
-FROM openjdk:11-jdk-slim
+FROM eclipse-temurin:11
 
 WORKDIR /app
 
