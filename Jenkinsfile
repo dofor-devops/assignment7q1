@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Compile') {
             steps {
-                sh 'javac HelloWorld.java'
+                sh 'javac --release 11 HelloWorld.java'
             }
         }
         stage('Execute') {
