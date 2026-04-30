@@ -52,6 +52,25 @@ pipeline {
                         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
                         docker push ${DOCKER_IMAGE_NAME}:${IMAGE_TAG}
                         """
+	stage('Deploy to Kubernetes') {
+ 	   steps {
+        	script {
+            		sh 'kubectl apply -f k8s-deployment.yaml'
+            			sh 'kubectl apply -f k8s-service.yaml'
+        }
+    }
+}
+	
+	stage('Verify Deployment') {
+	    steps {
+	        script {
+        	    sh 'kubectl get pods'
+            		sh 'kubectl get services'
+        }
+    }
+}
+
+
                     }
                 }
             }
