@@ -28,51 +28,40 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                script {
-                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${IMAGE_TAG} ."
-                }
+                sh "docker build -t ${DOCKER_IMAGE_NAME}:${IMAGE_TAG} ."
             }
         }
 
         stage('Docker Run') {
             steps {
-                script {
-                    sh "docker run --rm ${DOCKER_IMAGE_NAME}:${IMAGE_TAG}"
-                }
+                sh "docker run --rm ${DOCKER_IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
 
         stage('Push to DockerHub') {
             steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'my-docker-hub-credentials-id',
-                                                     usernameVariable: 'DOCKER_USERNAME',
-                                                     passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh """
-                        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-                        docker push ${DOCKER_IMAGE_NAME}:${IMAGE_TAG}
-                        """
-	stage('Deploy to Kubernetes') {
- 	   steps {
-        	script {
-            		sh 'kubectl apply -f k8s-deployment.yaml'
-            			sh 'kubectl apply -f k8s-service.yaml'
-        }
-    }
-}
-	
-	stage('Verify Deployment') {
-	    steps {
-	        script {
-        	    sh 'kubectl get pods'
-            		sh 'kubectl get services'
-        }
-    }
-}
-
-
-                    }
+                withCredentials([usernamePassword(credentialsId: 'my-docker-hub-credentials-id',
+                                                 usernameVariable: 'DOCKER_USERNAME',
+                                                 passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh """
+                    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                    docker push ${DOCKER_IMAGE_NAME}:${IMAGE_TAG}
+                    """
                 }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh 'kubectl apply -f k8s-deployment.yaml'
+                sh 'kubectl apply -f k8s-service.yaml'
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh 'kubectl get pods'
+                sh 'kubectl get svc'
             }
         }
     }
