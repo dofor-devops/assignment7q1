@@ -53,31 +53,18 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f k8s-deployment.yaml'
-                sh 'kubectl apply -f k8s-service.yaml'
+                // Using the full path to kubectl as you did in later stages
+                sh '/usr/local/bin/kubectl apply -f k8s-deployment.yaml'
+                sh '/usr/local/bin/kubectl apply -f k8s-service.yaml'
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                sh 'kubectl get pods'
-                sh 'kubectl get svc'
-            }
-        }
-
-    stages {
-        stage('Check Kubernetes') {
-            steps {
+                sh '/usr/local/bin/kubectl get pods'
+                sh '/usr/local/bin/kubectl get svc'
                 sh '/usr/local/bin/kubectl get nodes'
             }
         }
-
-        stage('Deploy') {
-            steps {
-                sh '/usr/local/bin/kubectl apply -f deployment.yaml'
-            }
-        }
-    }
-}
-
- 
+    } // End of stages
+} // End of pipeline
